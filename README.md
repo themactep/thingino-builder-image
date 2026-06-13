@@ -1,5 +1,7 @@
 # thingino-builder-image
 
+[![Build and push container image](https://github.com/themactep/thingino-builder-image/actions/workflows/build-and-push.yml/badge.svg)](https://github.com/themactep/thingino-builder-image/actions/workflows/build-and-push.yml)
+
 Podman (and Docker) image for building [Thingino firmware](https://github.com/themactep/thingino-firmware) in a standardized and reproducible environment.
 
 Pre-built images are published to the GitHub Container Registry:
