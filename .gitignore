@@ -1,0 +1,16 @@
+# Local test workspaces and download cache (not committed)
+workspace/
+dl/
+downloads/
+
+# Build/test noise
+*.log
+tmp/
+temp/
+*.tmp
+
+# Editor files
+.idea/
+.vscode/
+*.swp
+*~

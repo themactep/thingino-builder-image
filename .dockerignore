@@ -1,0 +1,23 @@
+# Ignore git and CI metadata
+.git
+.gitignore
+.gitmodules
+.github
+
+# Documentation not needed for build context
+*.md
+docs/
+
+# Local editor / IDE noise
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Anything a developer might have in the builder repo checkout
+workspace/
+dl/
+output/
+*.log
+tmp/
