@@ -77,6 +77,10 @@ RUN update-alternatives --install /usr/bin/editor editor /usr/bin/vim 1 && \
     update-alternatives --install /usr/bin/vi vi /usr/bin/vim 1 && \
     update-alternatives --set vi /usr/bin/vim
 
+# Switch from uutils coreutils install to GNU install (uutils has known bugs
+# that break Buildroot: https://github.com/uutils/coreutils/issues/12166)
+RUN update-alternatives --install /usr/bin/install install /usr/bin/gnuinstall 100
+
 # CA certificates and locale (UTF-8 is expected by many build scripts)
 RUN update-ca-certificates && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
