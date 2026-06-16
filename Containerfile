@@ -4,15 +4,7 @@
 # thingino-builder-image — Standardized, reproducible container image for compiling Thingino firmware.
 # Pre-built images are hosted at ghcr.io/themactep/thingino-builder-image
 
-FROM debian:trixie
-
-# Build-time user configuration (used when building image locally).
-# For pre-built hosted images these default to 1000:builder.
-# Local rebuilds (e.g. via firmware's Makefile.docker) override via --build-arg
-# to match the invoking user's UID/GID and avoid permission issues on bind mounts.
-ARG USER_ID=1000
-ARG GROUP_ID=1000
-ARG USERNAME=builder
+FROM ubuntu:26.04
 
 LABEL org.opencontainers.image.title="Thingino Builder Image"
 LABEL org.opencontainers.image.description="Standardized container image for building Thingino firmware"
@@ -95,29 +87,27 @@ ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8
 
-# Create the builder user (matches defaults for hosted image; overridable at build time)
-RUN groupadd -g ${GROUP_ID} ${USERNAME} && \
-    useradd -m -u ${USER_ID} -g ${GROUP_ID} -s /bin/bash ${USERNAME} && \
-    echo "${USERNAME}:${USERNAME}" | chpasswd && \
-    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# Configure the existing ubuntu user for build use
+RUN echo "ubuntu:ubuntu" | chpasswd && \
+    echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Standard location for Buildroot's download cache (can be overridden with -e BR2_DL_DIR=...)
-ENV BR2_DL_DIR=/home/${USERNAME}/dl
+ENV BR2_DL_DIR=/home/ubuntu/dl
 
 # Default working directory. Most usage overrides this with -w /workspace
 # together with a bind mount of the firmware tree.
-WORKDIR /home/${USERNAME}
+WORKDIR /home/ubuntu
 
 # Make the (future) mount point a safe git directory so users can run git commands inside.
 RUN git config --global --add safe.directory /workspace && \
-    git config --global --add safe.directory /home/${USERNAME} && \
+    git config --global --add safe.directory /home/ubuntu && \
     git config --global alias.up 'pull --rebase --autostash'
 
 # Copy and prepare entrypoint (lightweight runtime initialization)
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod 0755 /usr/local/bin/entrypoint.sh
 
-USER ${USERNAME}
+USER ubuntu
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 

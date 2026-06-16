@@ -78,6 +78,28 @@ Those scripts currently default to building a local image (often tagged `thingin
 
 For the simplest "just works" hosted experience, the direct `podman run ...` examples above are sufficient and avoid a full local image rebuild on every machine.
 
+## Using the convenience `run.sh` (from this repository)
+
+If you cloned the `thingino-builder-image` repository, you can use the small wrapper for a completely transparent experience:
+
+```bash
+./run.sh                 # exactly like running "make" inside the container
+./run.sh fast            # exactly like "make fast"
+./run.sh dev             # exactly like "make dev"
+./run.sh menuconfig      # exactly like "make menuconfig"
+./run.sh ota IP=192.168.1.123
+./run.sh bash            # drop into an interactive shell
+CAMERA=wyze_cam_v3 ./run.sh fast     # environment variables are forwarded
+```
+
+The script will:
+- Detect if you're already inside a firmware checkout.
+- Otherwise maintain a checkout under `./workspace/firmware` (cloned with `--recurse-submodules` if missing).
+- Mount a persistent download cache under `./workspace/dl`.
+- Pass environment variables and all arguments through so usage feels identical to running `make` locally.
+
+This is mainly useful for quick testing from the builder repo itself. Most day-to-day development is done by cloning `thingino-firmware` and either using its own `docker-build.sh` or the direct `podman run` commands shown above.
+
 ## Building the container image locally (for customization or air-gapped)
 
 ```bash
