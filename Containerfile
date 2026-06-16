@@ -48,6 +48,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get update && \
         mtools \
         nano \
         nodejs \
+        p7zip-full \
         npm \
         parted \
         perl \
