@@ -81,6 +81,15 @@ RUN update-alternatives --install /usr/bin/editor editor /usr/bin/vim 1 && \
 # that break Buildroot: https://github.com/uutils/coreutils/issues/12166)
 RUN update-alternatives --install /usr/bin/install install /usr/bin/gnuinstall 100
 
+# Install GitHub CLI (needed for release uploads and notifications in CI)
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+      | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+      | tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends gh && \
+    rm -rf /var/lib/apt/lists/*
+
 # CA certificates and locale (UTF-8 is expected by many build scripts)
 RUN update-ca-certificates && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
