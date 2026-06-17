@@ -12,6 +12,10 @@ git config --global --add safe.directory /home/builder 2>/dev/null || true
 git config --global --add safe.directory /home/builder/build 2>/dev/null || true
 git config --global --add safe.directory "$(pwd)" 2>/dev/null || true
 
+# Ensure the download cache directory is writable by the ubuntu user.
+# This handles volumes seeded from the dl cache image (files owned by root).
+sudo chown ubuntu:ubuntu /home/ubuntu/dl 2>/dev/null || true
+
 # If the user provided BR2_DL_DIR via the environment we respect it (already handled by ENV + runtime -e).
 # Nothing else to do here for a pure build environment.
 

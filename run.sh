@@ -17,7 +17,8 @@
 # Workspace / firmware tree handling:
 # - If the current directory looks like a thingino-firmware tree, it is used directly.
 # - Otherwise a firmware checkout is maintained in ./workspace/firmware (cloned on first use).
-# - Download cache lives in ./workspace/dl (or next to the firmware tree).
+# - Download cache uses a named volume (thingino-dl-cache), auto-seeded from
+#   the dl cache image (ghcr.io/themactep/thingino-dl) on first use.
 #
 
 set -e
@@ -62,23 +63,36 @@ else
     fi
 fi
 
-# Download cache (BR2_DL_DIR). Keep it outside the tree when possible so it can be shared.
-if [ -d "workspace/dl" ] || [ ! -d "$WORKSPACE_DIR/dl" ]; then
-    DL_DIR="$(pwd)/workspace/dl"
-else
-    DL_DIR="$WORKSPACE_DIR/dl"
+# Download cache: use a named volume for persistence across runs.
+# Auto-seeded from dl cache image (ghcr.io/themactep/thingino-dl) on first use.
+DL_VOLUME="thingino-dl-cache"
+DL_IMAGE="ghcr.io/themactep/thingino-dl:latest"
+
+if ! "$ENGINE" volume inspect "$DL_VOLUME" >/dev/null 2>&1; then
+    echo "Creating download cache volume: $DL_VOLUME"
+    # Seed from the dl cache image if available.
+    # The dl cache is built from release assets of thingino-firmware.
+    if "$ENGINE" pull "$DL_IMAGE" >/dev/null 2>&1; then
+        # Running a container with -v creates the volume and auto-populates
+        # it from the image content at the mount point.
+        "$ENGINE" run --rm -v "$DL_VOLUME:/dl" "$DL_IMAGE" /bin/true 2>/dev/null || true
+        "$ENGINE" run --rm -v "$DL_VOLUME:/dl" --user root --entrypoint chown "$IMAGE" -R ubuntu:ubuntu /dl 2>/dev/null || true
+        echo "Download cache seeded from $DL_IMAGE"
+    else
+        "$ENGINE" volume create "$DL_VOLUME" >/dev/null
+        echo "Note: $DL_IMAGE not available. Cache starts empty."
+    fi
 fi
-mkdir -p "$DL_DIR"
 
 echo "Firmware workspace: $WORKSPACE_DIR"
-echo "Download cache:     $DL_DIR"
+echo "Download cache volume: $DL_VOLUME"
 echo "Image:              $IMAGE"
 echo
 
 COMMON_OPTS=(
     --rm -it
     -v "$WORKSPACE_DIR:/workspace"
-    -v "$DL_DIR:/home/ubuntu/dl"
+    -v "$DL_VOLUME:/home/ubuntu/dl"
     -w /workspace
 )
 

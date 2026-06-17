@@ -13,3 +13,5 @@ COPY dl/ /dl/
 
 # Verify structure
 RUN echo "DL contents:" && ls /dl/ | head -20 && echo "..." && ls /dl/ | wc -l && echo "entries total"
+
+VOLUME /dl/

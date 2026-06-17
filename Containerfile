@@ -108,6 +108,9 @@ RUN echo "ubuntu:ubuntu" | chpasswd && \
 # Standard location for Buildroot's download cache (can be overridden with -e BR2_DL_DIR=...)
 ENV BR2_DL_DIR=/home/ubuntu/dl
 
+RUN mkdir -p /home/ubuntu/dl && chown ubuntu:ubuntu /home/ubuntu/dl
+VOLUME /home/ubuntu/dl
+
 # Default working directory. Most usage overrides this with -w /workspace
 # together with a bind mount of the firmware tree.
 WORKDIR /home/ubuntu
