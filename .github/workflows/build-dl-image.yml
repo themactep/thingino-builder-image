@@ -7,7 +7,7 @@ on:
         type: choice
         description: 'Source of dl/ directory'
         required: true
-        default: 'workspace'
+        default: 'release'
         options:
           - workspace
           - release
@@ -35,15 +35,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          REPO="${{ github.repository }}"
-          RELEASE_TAG=$(gh release list --repo "$REPO" --json name,tagName | jq -r '.[] | select(.name=="buildroot-dl-cache") | .tagName' | sort -r | head -1)
+          RELEASE_TAG=$(gh release list --repo themactep/thingino-firmware --json name,tagName | jq -r '.[] | select(.name=="buildroot-dl-cache") | .tagName' | sort -r | head -1)
           if [ -z "$RELEASE_TAG" ]; then
             echo "No buildroot-dl-cache release found"
             exit 1
           fi
           echo "Downloading from release: $RELEASE_TAG"
           mkdir -p /tmp/dl-cache
-          gh release download "$RELEASE_TAG" --repo "$REPO" --pattern "buildroot-dl-cache*" --dir "/tmp/dl-cache"
+          gh release download "$RELEASE_TAG" --repo themactep/thingino-firmware --pattern "buildroot-dl-cache*" --dir "/tmp/dl-cache"
           cd workspace
           7z x /tmp/dl-cache/buildroot-dl-cache.zip.001 -y
           if [ -d dl/dl ]; then
@@ -52,6 +51,7 @@ jobs:
           fi
 
       - name: Prune git sources from dl
+        if: github.event.inputs.dl_source == 'release'
         run: ./prune-dl.sh workspace/dl
 
       - name: Set up Docker Buildx
@@ -76,7 +76,7 @@ jobs:
       - name: Build and push DL image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./workspace
           file: ./Containerfile.dl
           push: true
           tags: ${{ steps.meta.outputs.tags }}
