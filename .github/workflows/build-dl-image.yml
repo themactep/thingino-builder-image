@@ -41,7 +41,7 @@ jobs:
             exit 1
           fi
           echo "Downloading from release: $RELEASE_TAG"
-          mkdir -p /tmp/dl-cache
+          mkdir -p workspace /tmp/dl-cache
           gh release download "$RELEASE_TAG" --repo themactep/thingino-firmware --pattern "buildroot-dl-cache*" --dir "/tmp/dl-cache"
           cd workspace
           7z x /tmp/dl-cache/buildroot-dl-cache.zip.001 -y
