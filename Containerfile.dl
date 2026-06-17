@@ -1,0 +1,15 @@
+# thingino-dl: curated Buildroot download cache volume image
+#
+# Contains only source tarballs/bundles needed by Buildroot.
+# Git repos (git/) and metadata (git.readme) are pruned.
+# Mount this as a volume or copy ~/dl from it before building.
+#
+# Size: ~900MB compressed, ~1.5GB uncompressed
+# vs. unpruned dl/ at 4.3GB (3.4GB of git repos removed)
+
+FROM busybox:stable-musl
+
+COPY dl/ /dl/
+
+# Verify structure
+RUN echo "DL contents:" && ls /dl/ | head -20 && echo "..." && ls /dl/ | wc -l && echo "entries total"
