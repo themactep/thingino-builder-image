@@ -9,6 +9,9 @@
 
 FROM busybox:stable-musl
 
+ARG DL_SOURCE_RELEASE=unknown
+LABEL dl.source.release=$DL_SOURCE_RELEASE
+
 COPY dl/ /dl/
 
 # Verify structure

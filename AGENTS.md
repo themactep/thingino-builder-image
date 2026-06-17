@@ -37,7 +37,7 @@ CAMERA=wyze_cam_v3 ./run.sh fast   # env forwarded
 
 ## CI
 
-- **`build-and-push.yml`** — pushes to main/master: builds + pushes multi-arch (`linux/amd64,linux/arm64`) builder image AND a fresh dl cache image to GHCR. Also runs on PRs (build only, no push). The dl cache image downloads the latest `buildroot-dl-cache` release from `themactep/thingino-firmware`, prunes git repos, and pushes as `ghcr.io/themactep/thingino-dl:latest`.
+- **`build-and-push.yml`** — pushes to main/master: builds + pushes multi-arch (`linux/amd64,linux/arm64`) builder image AND a fresh dl cache image to GHCR. Also runs on PRs (build only, no push). The dl cache job checks the latest `buildroot-dl-cache` release tag from `themactep/thingino-firmware` against the label on the current `ghcr.io/themactep/thingino-dl:latest` image; only downloads, prunes git repos, and pushes a new image if the release has changed. The release tag is stored in the image label `dl.source.release`.
 - **`build-dl-image.yml`** — manual trigger only (`workflow_dispatch`). Same dl cache build, for offline or debug use.
 
 ## Gotchas
