@@ -38,6 +38,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get update && \
         git \
         golang-go \
         libcrypt-dev \
+        libgmp-dev \
         libncurses-dev \
         libusb-1.0-0-dev \
         locales \
@@ -54,6 +55,7 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get update && \
         perl \
         python3 \
         python3-dev \
+        python3-gmpy2 \
         python3-jinja2 \
         python3-jsonschema \
         python3-setuptools \
